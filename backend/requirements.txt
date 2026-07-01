@@ -1,0 +1,11 @@
+fastapi
+uvicorn[standard]
+sqlalchemy[asyncio]
+asyncpg
+python-dotenv
+better-auth
+passlib[bcrypt]
+python-jose
+pydantic
+apscheduler
+pytz
