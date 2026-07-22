@@ -28,7 +28,14 @@ export default function LoginPage() {
       });
       const data = await res.json();
       if (!res.ok) {
-        throw new Error(data.detail || "Invalid email or password");
+        const detail = typeof data.detail === "string"
+          ? data.detail
+          : Array.isArray(data.detail)
+            ? data.detail.map((d: any) => d.msg || JSON.stringify(d)).join(", ")
+            : typeof data.detail === "object" && data.detail !== null
+              ? data.detail.msg || JSON.stringify(data.detail)
+              : "Invalid email or password";
+        throw new Error(detail);
       }
       toast.success("Welcome back!");
       await refreshUser();

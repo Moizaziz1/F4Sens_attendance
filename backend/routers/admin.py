@@ -4,10 +4,10 @@ from sqlalchemy import select, update, insert, delete, func
 from typing import List, Optional
 from datetime import date, datetime
 
-from ..dependencies import admin_required, get_current_user
-from ..auth import get_password_hash
-from ..db import get_db
-from ..models.user import User, Attendance, Notification
+from dependencies import admin_required, get_current_user
+from auth import get_password_hash
+from db import get_db
+from models.user import User, Attendance, Notification
 from pydantic import BaseModel, EmailStr, Field
 
 router = APIRouter(prefix="/admin", tags=["admin"])
@@ -169,6 +169,6 @@ async def update_attendance(attendance_id: str, req: AttendanceUpdateRequest, db
 @router.post("/trigger-notify")
 async def trigger_notify_endpoint(db: AsyncSession = Depends(get_db), _: User = Depends(admin_required)):
     # Placeholder – real logic lives in scheduler module
-    from ..scheduler import run_missed_attendance_notifications
+    from scheduler import run_missed_attendance_notifications
     await run_missed_attendance_notifications(db)
     return {"message": "Manual notification run completed"}

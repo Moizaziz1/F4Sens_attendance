@@ -5,7 +5,7 @@ from typing import Optional
 from sqlalchemy import Column, String, DateTime, Date, Text, Boolean, Enum, UniqueConstraint, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID
 
-from ..db import Base
+from db import Base
 
 # Enums for role and attendance status
 ROLE_ENUM = ('employee', 'admin')

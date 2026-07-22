@@ -1,11 +1,17 @@
 import asyncio
 import os
+import sys
+
+# Ensure the backend directory is on sys.path so absolute imports
+# (from db, from auth, etc.) work both locally and in Docker.
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .db import engine, Base
+from db import engine, Base
 from sqlalchemy import text
-from .scheduler import start_scheduler
+from scheduler import start_scheduler
 
 app = FastAPI(title="F4Sens Attendance Management API")
 
@@ -20,7 +26,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-from .routers import auth, attendance, reports, notifications, admin
+from routers import auth, attendance, reports, notifications, admin
 app.include_router(auth.router)
 app.include_router(attendance.router)
 app.include_router(reports.router)
@@ -37,9 +43,9 @@ async def on_startup():
         # Create all tables
         await conn.run_sync(Base.metadata.create_all)
     # Seed admin user if not exists
-    from .auth import get_password_hash
-    from .models.user import User
-    from .db import get_db
+    from auth import get_password_hash
+    from models.user import User
+    from db import get_db
     async for session in get_db():
         result = await session.execute(
             text("SELECT id FROM users WHERE email = :email"),

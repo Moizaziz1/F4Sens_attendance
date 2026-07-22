@@ -4,9 +4,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, update
 from datetime import datetime
 
-from ..dependencies import get_current_user
-from ..db import get_db
-from ..models.user import Notification
+from dependencies import get_current_user
+from db import get_db
+from models.user import Notification
 from typing import List
 
 router = APIRouter(prefix="/notifications", tags=["notifications"])

@@ -3,8 +3,8 @@ from datetime import datetime, date
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, insert
 
-from .models.user import User, Notification, Attendance
-from .auth import create_access_token
+from models.user import User, Notification, Attendance
+from auth import create_access_token
 
 async def run_missed_attendance_notifications(db: AsyncSession):
     """Check for employees without today's attendance and create a notification.

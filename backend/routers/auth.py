@@ -5,11 +5,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import text
 from datetime import timedelta
 
-from ..db import get_db
-from ..auth import get_password_hash, verify_password, create_access_token
-from ..models.user import User
+from db import get_db
+from auth import get_password_hash, verify_password, create_access_token
+from models.user import User
 from pydantic import BaseModel, EmailStr, Field
-from ..dependencies import get_current_user
+from dependencies import get_current_user
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 

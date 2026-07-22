@@ -4,9 +4,9 @@ from sqlalchemy import select, and_, func
 from datetime import datetime, date, time, timezone, timedelta
 from zoneinfo import ZoneInfo
 
-from ..dependencies import get_current_user
-from ..db import get_db
-from ..models.user import Attendance, User
+from dependencies import get_current_user
+from db import get_db
+from models.user import Attendance, User
 from pydantic import BaseModel, ConfigDict
 from typing import Optional
 

@@ -30,7 +30,14 @@ export default function RegisterPage() {
       });
       const data = await res.json();
       if (!res.ok) {
-        throw new Error(data.detail || "Registration failed");
+        const detail = typeof data.detail === "string"
+          ? data.detail
+          : Array.isArray(data.detail)
+            ? data.detail.map((d: any) => d.msg || JSON.stringify(d)).join(", ")
+            : typeof data.detail === "object" && data.detail !== null
+              ? data.detail.msg || JSON.stringify(data.detail)
+              : "Registration failed";
+        throw new Error(detail);
       }
       toast.success("Account created! Please sign in.");
       await refreshUser();

@@ -4,9 +4,9 @@ from sqlalchemy import select, and_, func
 from datetime import date, datetime
 from typing import List, Optional
 
-from ..dependencies import get_current_user
-from ..db import get_db
-from ..models.user import Attendance
+from dependencies import get_current_user
+from db import get_db
+from models.user import Attendance
 from pydantic import BaseModel
 
 router = APIRouter(prefix="/reports", tags=["reports"])

@@ -2,9 +2,9 @@ from fastapi import Depends, HTTPException, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import text
 
-from .db import get_db
-from .auth import decode_access_token
-from .models.user import User
+from db import get_db
+from auth import decode_access_token
+from models.user import User
 
 async def get_current_user(request: Request, db: AsyncSession = Depends(get_db)) -> User:
     token = request.cookies.get("access_token")
