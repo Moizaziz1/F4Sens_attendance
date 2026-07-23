@@ -18,7 +18,7 @@ app = FastAPI(title="F4Sens Attendance Management API")
 frontend_url = os.getenv("FRONTEND_URL", "http://localhost:3000")
 # Support comma-separated FRONTEND_URL values (e.g. "https://app.vercel.app,https://hf.space")
 extra_origins = [u.strip() for u in os.getenv("EXTRA_ORIGINS", "").split(",") if u.strip()]
-allow_origins = [frontend_url, *extra_origins, "http://localhost:3000", "http://localhost:3001", "http://127.0.0.1:3000", "http://127.0.0.1:3001"]
+allow_origins = [frontend_url, *extra_origins, "http://localhost:3000", "http://localhost:3001", "http://127.0.0.1:3000", "http://127.0.0.1:3001", "https://f4sens-attendance.vercel.app"]
 # Remove duplicate origins
 allow_origins = list(dict.fromkeys(allow_origins))
 
