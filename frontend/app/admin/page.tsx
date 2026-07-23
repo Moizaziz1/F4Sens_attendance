@@ -46,7 +46,7 @@ export default function AdminPage() {
   useEffect(() => {
     const check = async () => {
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/me`, { credentials: "include" });
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000"}/auth/me`, { credentials: "include" });
         if (!res.ok) {
           router.replace("/login");
           return;

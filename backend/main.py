@@ -17,6 +17,8 @@ app = FastAPI(title="F4Sens Attendance Management API")
 
 frontend_url = os.getenv("FRONTEND_URL", "http://localhost:3000")
 allow_origins = [frontend_url, "http://localhost:3000", "http://localhost:3001", "http://127.0.0.1:3000", "http://127.0.0.1:3001"]
+# Remove duplicate origins
+allow_origins = list(dict.fromkeys(allow_origins))
 
 app.add_middleware(
     CORSMiddleware,

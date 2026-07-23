@@ -13,6 +13,8 @@ from dependencies import get_current_user
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
+IS_PRODUCTION = os.getenv("ENVIRONMENT") == "production"
+
 class RegisterRequest(BaseModel):
     name: str = Field(..., min_length=1)
     email: EmailStr
@@ -44,7 +46,7 @@ async def register(req: RegisterRequest, response: Response, db: AsyncSession = 
     await db.commit()
     await db.refresh(new_user)
     token = create_access_token({"sub": str(new_user.id)})
-    response.set_cookie(key="access_token", value=token, httponly=True, samesite="lax", secure=False)
+    response.set_cookie(key="access_token", value=token, httponly=True, samesite="lax", secure=IS_PRODUCTION)
     return {"access_token": token, "token_type": "bearer", "message": "User registered successfully"}
 
 @router.post("/login")
@@ -59,13 +61,13 @@ async def login(req: LoginRequest, response: Response, db: AsyncSession = Depend
     if not user.is_active:
         raise HTTPException(status_code=403, detail="User account is deactivated")
     token = create_access_token({"sub": str(user.id)})
-    response.set_cookie(key="access_token", value=token, httponly=True, samesite="lax", secure=False)
+    response.set_cookie(key="access_token", value=token, httponly=True, samesite="lax", secure=IS_PRODUCTION)
     return {"access_token": token, "token_type": "bearer", "message": "Login successful"}
 
 
 @router.post("/logout")
 async def logout(response: Response):
-    response.delete_cookie(key="access_token", samesite="lax", secure=False)
+    response.delete_cookie(key="access_token", samesite="lax", secure=IS_PRODUCTION)
     return {"message": "Logged out successfully"}
 
 
