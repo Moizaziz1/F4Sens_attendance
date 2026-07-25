@@ -4,7 +4,7 @@ sqlalchemy[asyncio]
 asyncpg
 python-dotenv
 better-auth
-passlib[bcrypt]
+bcrypt
 python-jose
 pydantic[email]
 apscheduler
