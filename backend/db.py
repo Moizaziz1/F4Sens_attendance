@@ -8,7 +8,7 @@ from sqlalchemy.orm import declarative_base
 # Load environment variables (expects .env in backend directory)
 from dotenv import load_dotenv
 
-load_dotenv(dotenv_path=Path(__file__).parent.parent / ".env")
+load_dotenv(dotenv_path=Path(__file__).parent / ".env")
 
 import re
 from urllib.parse import urlparse, parse_qs, urlencode, urlunparse
@@ -36,7 +36,14 @@ if needs_ssl:
     ssl_context.verify_mode = ssl.CERT_NONE
     connect_args["ssl"] = ssl_context
 
-engine: AsyncEngine = create_async_engine(DATABASE_URL, echo=False, future=True, connect_args=connect_args)
+engine: AsyncEngine = create_async_engine(
+    DATABASE_URL,
+    echo=False,
+    future=True,
+    connect_args=connect_args,
+    pool_pre_ping=True,
+    pool_recycle=300,
+)
 AsyncSessionLocal = async_sessionmaker(bind=engine, class_=AsyncSession, expire_on_commit=False)
 
 Base = declarative_base()
