@@ -1,13 +1,11 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
-
-async function verifyAuth(token: string): Promise<boolean> {
+async function verifyAuth(token: string, request: NextRequest): Promise<boolean> {
   try {
-    const res = await fetch(`${API_URL}/auth/me`, {
+    const meUrl = new URL("/api/auth/me", request.url);
+    const res = await fetch(meUrl.toString(), {
       headers: { Cookie: `access_token=${token}` },
-      credentials: "include",
     });
     return res.ok;
   } catch {
@@ -22,13 +20,12 @@ export async function middleware(request: NextRequest) {
   const isAuthPage = pathname === "/login" || pathname === "/register";
   const isProtectedRoute = pathname.startsWith("/dashboard") || pathname.startsWith("/admin");
 
-  // Skip auth verification during build/prerendering
-  if (process.env.NEXT_PHASE === "phase-production-build" || !process.env.NEXT_PUBLIC_API_URL) {
+  if (process.env.NEXT_PHASE === "phase-production-build") {
     return NextResponse.next();
   }
 
   if (isAuthPage && token) {
-    const isValid = await verifyAuth(token);
+    const isValid = await verifyAuth(token, request);
     if (isValid) {
       return NextResponse.redirect(new URL("/dashboard", request.url));
     }
@@ -41,7 +38,7 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(loginUrl);
     }
 
-    const isValid = await verifyAuth(token);
+    const isValid = await verifyAuth(token, request);
     if (!isValid) {
       const response = NextResponse.redirect(new URL("/login", request.url));
       response.cookies.delete("access_token");

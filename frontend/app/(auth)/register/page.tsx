@@ -6,8 +6,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { useAuth } from "../../../lib/auth-context";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
-
 export default function RegisterPage() {
   const router = useRouter();
   const { refreshUser } = useAuth();
@@ -22,11 +20,10 @@ export default function RegisterPage() {
     e.preventDefault();
     setIsLoading(true);
     try {
-      const res = await fetch(`${API_URL}/auth/register`, {
+      const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, email, password, department: department || undefined }),
-        credentials: "include",
       });
       const data = await res.json();
       if (!res.ok) {

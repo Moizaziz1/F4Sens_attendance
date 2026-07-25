@@ -6,8 +6,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { useAuth } from "../../../lib/auth-context";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
-
 export default function LoginPage() {
   const router = useRouter();
   const { refreshUser } = useAuth();
@@ -20,11 +18,10 @@ export default function LoginPage() {
     e.preventDefault();
     setIsLoading(true);
     try {
-      const res = await fetch(`${API_URL}/auth/login`, {
+      const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
-        credentials: "include",
       });
       const data = await res.json();
       if (!res.ok) {

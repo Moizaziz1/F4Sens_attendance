@@ -13,8 +13,6 @@ from dependencies import get_current_user
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
-IS_PRODUCTION = os.getenv("ENVIRONMENT") == "production"
-
 class RegisterRequest(BaseModel):
     name: str = Field(..., min_length=1)
     email: EmailStr
@@ -25,12 +23,8 @@ class LoginRequest(BaseModel):
     email: EmailStr
     password: str
 
-class TokenResponse(BaseModel):
-    access_token: str
-    token_type: str = "bearer"
-
 @router.post("/register", status_code=201)
-async def register(req: RegisterRequest, response: Response, db: AsyncSession = Depends(get_db)):
+async def register(req: RegisterRequest, db: AsyncSession = Depends(get_db)):
     result = await db.execute(text("SELECT id FROM users WHERE email = :email"), {"email": req.email})
     if result.fetchone():
         raise HTTPException(status_code=400, detail="Email already registered")
@@ -46,11 +40,10 @@ async def register(req: RegisterRequest, response: Response, db: AsyncSession = 
     await db.commit()
     await db.refresh(new_user)
     token = create_access_token({"sub": str(new_user.id)})
-    response.set_cookie(key="access_token", value=token, httponly=True, samesite="lax", secure=IS_PRODUCTION)
     return {"access_token": token, "token_type": "bearer", "message": "User registered successfully"}
 
 @router.post("/login")
-async def login(req: LoginRequest, response: Response, db: AsyncSession = Depends(get_db)):
+async def login(req: LoginRequest, db: AsyncSession = Depends(get_db)):
     result = await db.execute(text("SELECT * FROM users WHERE email = :email"), {"email": req.email})
     user_row = result.mappings().fetchone()
     if not user_row:
@@ -61,13 +54,11 @@ async def login(req: LoginRequest, response: Response, db: AsyncSession = Depend
     if not user.is_active:
         raise HTTPException(status_code=403, detail="User account is deactivated")
     token = create_access_token({"sub": str(user.id)})
-    response.set_cookie(key="access_token", value=token, httponly=True, samesite="lax", secure=IS_PRODUCTION)
     return {"access_token": token, "token_type": "bearer", "message": "Login successful"}
 
 
 @router.post("/logout")
-async def logout(response: Response):
-    response.delete_cookie(key="access_token", samesite="lax", secure=IS_PRODUCTION)
+async def logout():
     return {"message": "Logged out successfully"}
 
 
