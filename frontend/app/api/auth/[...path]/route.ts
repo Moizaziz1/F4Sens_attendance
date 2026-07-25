@@ -1,10 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL;
 const COOKIE_NAME = "access_token";
 const COOKIE_MAX_AGE = 60 * 60 * 24;
 
 async function proxyRequest(request: NextRequest, path: string) {
+  if (!BACKEND_URL) {
+    return NextResponse.json(
+      { detail: "NEXT_PUBLIC_API_URL is not set on the server" },
+      { status: 500 }
+    );
+  }
+
   const url = `${BACKEND_URL}/auth/${path}`;
   const method = request.method;
 
@@ -23,8 +30,26 @@ async function proxyRequest(request: NextRequest, path: string) {
     init.body = await request.text();
   }
 
-  const backendRes = await fetch(url, init);
-  const data = await backendRes.json();
+  let backendRes: Response;
+  try {
+    backendRes = await fetch(url, init);
+  } catch (err: any) {
+    return NextResponse.json(
+      { detail: `Cannot reach backend: ${err.message}` },
+      { status: 502 }
+    );
+  }
+
+  const text = await backendRes.text();
+  let data: any;
+  try {
+    data = JSON.parse(text);
+  } catch {
+    return NextResponse.json(
+      { detail: `Backend returned non-JSON: ${text.slice(0, 300)}` },
+      { status: backendRes.status || 502 }
+    );
+  }
 
   const response = NextResponse.json(data, { status: backendRes.status });
 
@@ -51,14 +76,28 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ path: string[] }> }
 ) {
-  const { path } = await params;
-  return proxyRequest(request, path.join("/"));
+  try {
+    const { path } = await params;
+    return await proxyRequest(request, path.join("/"));
+  } catch (err: any) {
+    return NextResponse.json(
+      { detail: `Proxy error: ${err.message}` },
+      { status: 500 }
+    );
+  }
 }
 
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ path: string[] }> }
 ) {
-  const { path } = await params;
-  return proxyRequest(request, path.join("/"));
+  try {
+    const { path } = await params;
+    return await proxyRequest(request, path.join("/"));
+  } catch (err: any) {
+    return NextResponse.json(
+      { detail: `Proxy error: ${err.message}` },
+      { status: 500 }
+    );
+  }
 }
